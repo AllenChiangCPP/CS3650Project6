@@ -3,6 +3,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 class Assembler {
        //defines 0, 1, and 2, as char for A, C, and L commands
@@ -60,7 +63,7 @@ class Assembler {
                             //adds label name as key to corresponding line number and puts it in symbols to record a label'nextLine address in the symbol table
                             //checks if a label defined multiple times, if put method returns value taht is not null, throw exception
                             if (symbols.put(nextLine.substring(1, nextLine.length() - 1), currentCodeLine) != null) 
-                                   throw new Exception("symbol " + nextLine.substring(1, nextLine.length() - 1) + " is defined multiple times."); 
+                                   throw new Exception("ERROR. Symbol " + nextLine.substring(1, nextLine.length() - 1) + " is defined multiple times."); 
                 } else
                      currentCodeLine += 1; //increment currentCodeLine to next address of next instruction of assembly code
                      nextLine = nextCommand(); //read next command from assembly code for next loop
@@ -146,7 +149,7 @@ class Assembler {
                      case "M-D": return 0b1000111;
                      case "D&M": return 0b1000000;
                      case "D|M": return 0b1010101;
-                     default: throw new Exception("not valid computation!"); //default case, if value not recognized throw exception 
+                     default: throw new Exception("ERROR. Invalid computation."); //default case, if value not recognized throw exception 
               }
        }
 
@@ -208,20 +211,35 @@ class Assembler {
               return String.format("%16s", Integer.toBinaryString(raw)).replace(' ', '0');
        }
 
+       private static String getOutputFileName(String inputFileName) { //emthod for getting assembly file name for file print
+              int dotIndex = inputFileName.lastIndexOf('.');
+              if (dotIndex != -1) {
+                  // Remove the original file extension
+                  inputFileName = inputFileName.substring(0, dotIndex);
+              }
+              return inputFileName + "JAVA.hack"; // Add .hack extension and JAVA label to new file
+          }
+
        public static void main(String args[]) { //main method, code run through command line
               if (args.length == 0) { //checks if no command line argument given, if so end program and print error message
-                     System.err.println("no input file");
+                     System.err.println("ERROR. No input file given");
                      return;
               }
+              String inputFileName = args[0]; //use command line input as inputFileName
+              String outputFileName = getOutputFileName(inputFileName); // Determine the output file name
               Assembler assembler = new Assembler(args[0]); //assembler object, takes in assembly file
               String machineCode; //string machineCode, stores parsed machien code for each assembly command
               try { //try/catch statment for handling exceptions
+                     BufferedWriter writeFile = new BufferedWriter(new FileWriter(outputFileName));
                      while(true) { //infinite loop for parsing and prcessing each assembly command in a file
                             machineCode = assembler.parseNextCommand(); //next assembly command form input file, translates it to machine code
                             if (machineCode == null) { //check if machineCode is null, indicates end of input file, if rached, exit loop and terminate program
+                                   writeFile.close();
                                    return;
                             }
-                            System.out.println(machineCode); //print machine code machineCode to the commadn line
+                            writeFile.write(machineCode); //write machineCode to file
+                            writeFile.newLine();
+                            System.out.println(machineCode); //print machine code machineCode to the command line
                      }
               } 
               catch (Exception exception) { //catch exception and print error message
