@@ -22,5 +22,5 @@ The results Assembler.java printed in command line and in .hack files
 
 
 **Usage**<br>
-          -Compiling: "javac -d testing  assembler/Assembler.java" in the command line to compile Assembler.java as assembler. Assembler in testing folder.<br>
-          -Running: Go into the testing folder and run the command "java Assembler <.asm file here>".
+          -Compiling: Type "javac -d testing  assembler/Assembler.java" outside the assembler folder in the command line to compile Assembler.java as Assembler.class. Assembler.class is in the testing folder for testing with given assembly files.<br>
+          -Running: Go into the testing folder and run the command "java Assembler <.asm file here>" in the command line. Running the code outputs a hack file sharing the same name as the given assembly file with "JAVA" after the assembly file name.
